@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     # 'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'corsheaders',
+    'django_countries',
+    'travelagency.apps.TravelagencyConfig'
 ]
 
 MIDDLEWARE = [
@@ -142,7 +144,7 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=2),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
@@ -176,3 +178,13 @@ SIMPLE_JWT = {
 # cors setting
 # TODO: Set this to more restricted later.
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+# TODO: delete below after csv file setup done
+
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+    
+]
+STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')

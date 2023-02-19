@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from .serializers import UserSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,43 +9,74 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
 class UserList(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         users = User.objects.all()
         serializer = UserSerializer(users,many=True)
         return Response(serializer.data)
 # TODO: make authenticate people disallowed to go in register,login routes
+# TODO: may be add features like email otp sending, forgot password, oauth later, check if
+# this login/logout is working
+
+
+def log(val,delim="-"):
+    for i in range(30):
+        print(delim,end='')
+    print()
+    print(val)
+    for i in range(30):
+        print(delim,end='')
+    print()
+
+# A valid form for registering user
+# {
+#     "id": 2,
+#     "email": "liya@gmail.com",
+#     "date_of_birth": "2001-03-22",
+#     "gender": "F",
+#     "nationality": "AF",
+#     "password":"nepalGreat123",
+#     "contactNum": 2222678662,
+#     "languages": [
+#         "CN",
+#         "JP"
+#     ],
+#     "first_name": "liya",
+#     "last_name": "pina"
+# }
+
 class UserRegister(APIView):
     permission_classes = [AllowAny]
     def post(self,request):
         serializer = UserSerializer(data=request.data)
-        data = []
         if serializer.is_valid():
             user = serializer.save()
-            user.is_active =True
+            user.is_active = True
             user.save()
             # TODO: make user register only by valid email, i.e. say otp
             data ={
                 'message':'User registered Successfully',
                 'id':user.id,
-                'username':user.username,
+                'email':user.email,
             }
             return Response(data,status=status.HTTP_201_CREATED)
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        # return Response({"done":"yes"},status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class UserLogin(APIView):
     permission_classes =[AllowAny]
     def post(self,request):
         print(request.data)
         print(type(request.data))
-        if not (request.data.get('username',False) and request.data.get('password',False)):
+        if not (request.data.get('email',False) and request.data.get('password',False)):
             error ={
-                'message':'Username and/or password field is empty.',
+                'message':'Email and/or password field is empty.',
             }
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.get(username=request.data.get('username'),password=request.data.get('password'))
+            user = User.objects.get(email=request.data.get('email'),password=request.data.get('password'))
             if user is not None:
                 refresh = RefreshToken.for_user(user)
                 data = {
@@ -54,18 +84,17 @@ class UserLogin(APIView):
                     'access': str(refresh.access_token),
                     'message': 'User login done Successfully',
                     'id': user.id,
-                    'username': user.username,
+                    'email': user.email,
                 }
                 return Response(data, status=status.HTTP_200_OK)
             else:
-                print("-------raised User doesn't exist -----------")
+                print("-------raised User doesn't exist error -----------")
                 raise User.DoesNotExist
         except User.DoesNotExist:
             error = {
                 'message':'Invalid username and/or password',
             }
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
-
 
 # for now the logout will be handled in client side 
 #  by deleting the access,refresh token, but in reality
