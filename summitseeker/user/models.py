@@ -2,15 +2,6 @@ from django.db import models
 from django.contrib.auth import models as auth_models
 from django_countries.fields import CountryField
 import datetime
-# class User(auth_models.AbstractUser):
-#     userType = [
-#         ('TR', 'Trekker'),
-#         ('GD', 'Guide'),
-#     ]
-#     type = models.CharField(max_length=2, choices=userType,
-#                             default='TR', blank=False)
-#     REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'type','password']
-
 
 class Language(models.Model):
     # the list is for reference purpose only
@@ -70,6 +61,10 @@ class User(auth_models.AbstractUser):
         ('O','Other'),
         ('R','Rather not say')
     ]
+    usertypes = [
+        ('TR','Tourist'),
+        ('GD','Guide')
+    ]
     username = None
     email = models.EmailField(verbose_name='email',max_length=60,unique=True)
     # avatar = models.ImageField(max_length=300)
@@ -79,12 +74,13 @@ class User(auth_models.AbstractUser):
     bio = models.TextField(default='',blank=True)
     contactNum = models.BigIntegerField(default=0)
     # avgRating = models.FloatField()
-    languages = models.ManyToManyField(Language,blank=True)    
+    languages = models.ManyToManyField(Language,blank=True)
+    userType = models.CharField(choices = usertypes,max_length=2,default='TR')    
     
     USERNAME_FIELD = "email"
     # REQUIRED_FIELDS = ['first_name','last_name','date_of_birth','gender','nationality','contactNum','language']
     # TODO: need to find a way to put language in like create superuser
-    REQUIRED_FIELDS = ['first_name', 'last_name','nationality','gender','date_of_birth']
+    REQUIRED_FIELDS = ['first_name', 'last_name','nationality','gender','date_of_birth','userType']
 
     objects = UserManager()
     def __str__(self):
@@ -95,3 +91,25 @@ class User(auth_models.AbstractUser):
 
     def has_module_perms(self,app_label):
         return True
+    
+class Tourist(models.Model):
+    exp =[
+        ('N','Never Done'),
+        ('B','Beginner'),
+        ('S','Seasoned'),
+        ('P','Professional')
+    ]
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    trekking_experience = models.CharField(choices=exp,max_length=2,default='B')
+    # visited_trails = models
+
+    def __str__(self):
+        return self.user.email
+
+class Guide(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    total_trek_count = models.IntegerField(default=0)
+    availability = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.user.email

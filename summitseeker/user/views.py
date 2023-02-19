@@ -1,10 +1,11 @@
-from .serializers import UserSerializer
+from .serializers import UserSerializer,TouristSerializer,GuideSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import User
 from rest_framework import status
 from django.http import Http404
 from rest_framework.permissions import AllowAny,IsAuthenticated
+from .permissions import IsTourist,IsGuide
 # from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -42,22 +43,81 @@ def log(val,delim="-"):
 #         "JP"
 #     ],
 #     "first_name": "liya",
-#     "last_name": "pina"
+#     "last_name": "pina",
+#     "userType":"TR",
+#     "experience":"B"
 # }
+
+
+def get_user_types():
+    val = User.usertypes
+    x =[]
+    for i in val:
+        x.append(i[0])
+    log(x,delim="@")
+    return x
+
+def makeTouristData(data):
+    x = {}
+    if data.get('trekking_experience'):
+        x['trekking_experience'] = data.get('trekking_experience')
+    # TODO: add future fields here
+    return x
+
+def makeGuideData(data):
+    log(data,delim="#")
+    x = {}
+    if data.get('total_trek_count') is not None:
+        x['total_trek_count'] = data.get('total_trek_count')
+    
+    if data.get('availability') is not None:
+        x['availability'] = data.get('availability')
+    # TODO: add future fields here
+    return x
+
 
 class UserRegister(APIView):
     permission_classes = [AllowAny]
     def post(self,request):
+        userType = request.data.get('userType')
+        print(userType)
+        if not (userType and userType in get_user_types()):
+            print(userType)
+            return Response({
+                'message':'"userType" field not set or set to invalid value'
+            },status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            user.is_active = True
-            user.save()
+            if userType == 'TR':
+                # case: Tourist
+                tourist_data = makeTouristData(request.data)
+                serializer1 =TouristSerializer(data=tourist_data)
+                if serializer1.is_valid():
+                    user = serializer.save()
+                    user.is_active = True
+                    user.save()
+                    serializer1.save(user=user)
+                else:
+                    return Response(serializer1.errors, status=status.HTTP_400_BAD_REQUEST)
+            if userType == 'GD':
+                # case: Tourist
+                guide_data = makeGuideData(request.data)
+                serializer1 =GuideSerializer(data=guide_data)
+                if serializer1.is_valid():
+                    user = serializer.save()
+                    user.is_active = True
+                    user.save()
+                    serializer1.save(user=user)
+                else:
+                    return Response(serializer1.errors, status=status.HTTP_400_BAD_REQUEST)
+
             # TODO: make user register only by valid email, i.e. say otp
             data ={
                 'message':'User registered Successfully',
                 'id':user.id,
                 'email':user.email,
+                'userType':request.data['userType']
             }
             return Response(data,status=status.HTTP_201_CREATED)
         # return Response({"done":"yes"},status.HTTP_200_OK)
@@ -112,3 +172,12 @@ class UserDetail(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
+class Hello(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        x= request.user.userType
+        y = request.user
+        data = [
+            {'message':f'hi {y} is a {x}!!!'}
+        ]
+        return Response(data,status.HTTP_200_OK)
