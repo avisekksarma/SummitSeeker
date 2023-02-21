@@ -91,7 +91,16 @@ class User(auth_models.AbstractUser):
 
     def has_module_perms(self,app_label):
         return True
-    
+
+class Guide(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    total_trek_count = models.IntegerField(default=0)
+    availability = models.BooleanField(default=True)
+    reviews = models.ManyToManyField('Tourist',through='reviews.GuideReviews')
+
+    def __str__(self):
+        return f'{self.user.email}-{self.user.id}-{self.id}'
+
 class Tourist(models.Model):
     exp =[
         ('N','Never Done'),
@@ -101,15 +110,9 @@ class Tourist(models.Model):
     ]
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     trekking_experience = models.CharField(choices=exp,max_length=2,default='B')
+    reviews = models.ManyToManyField('Guide',through='reviews.TouristReviews')
     # visited_trails = models
 
     def __str__(self):
         return self.user.email
 
-class Guide(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
-    total_trek_count = models.IntegerField(default=0)
-    availability = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.user.email

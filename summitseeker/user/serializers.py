@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User,Language,Tourist,Guide
 
+
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
 

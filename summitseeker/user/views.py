@@ -6,6 +6,7 @@ from rest_framework import status
 from django.http import Http404
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from .permissions import IsTourist,IsGuide
+from utils import log
 # from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -19,15 +20,6 @@ class UserList(APIView):
 # TODO: may be add features like email otp sending, forgot password, oauth later, check if
 # this login/logout is working
 
-
-def log(val,delim="-"):
-    for i in range(30):
-        print(delim,end='')
-    print()
-    print(val)
-    for i in range(30):
-        print(delim,end='')
-    print()
 
 # A valid form for registering user
 # {
