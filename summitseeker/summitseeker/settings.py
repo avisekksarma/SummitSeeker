@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_countries',
     'travelagency.apps.TravelagencyConfig',
-    'reviews.apps.ReviewsConfig'
+    'reviews.apps.ReviewsConfig',
+    'hire.apps.HireConfig'
 ]
 
 MIDDLEWARE = [
@@ -191,3 +192,5 @@ STATICFILES_DIRS = [
     
 ]
 STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_URL ='media/'

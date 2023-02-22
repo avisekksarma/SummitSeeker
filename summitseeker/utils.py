@@ -22,3 +22,12 @@ def log(val,delim="-"):
         print(delim,end='')
     print()
 
+def makeResponse(message='',isSuccess=False,data=None,validation_error=False,**kwargs):
+    response = {
+        "message":message,
+        "success":isSuccess,
+        "data":data,
+        "validation_error":validation_error,
+        **kwargs
+    }
+    return response

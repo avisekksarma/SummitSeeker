@@ -35,3 +35,23 @@ class GuideReviews(models.Model):
         ]
     def __str__(self):
         return f'{self.tourist.user.email} reviewed {self.guide.user.email}'
+    
+class TrailReviews(models.Model):
+    trail = models.ForeignKey('hire.Trail', on_delete=models.CASCADE)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
+    comment = models.TextField()
+    rating = models.FloatField()
+    days = models.IntegerField()
+    difficulty = models.IntegerField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['trail', 'user'], name='unique_field_trail_user'),
+        ]
+        indexes = [
+            models.Index(fields=['trail', 'user']),
+        ]
+
+    def __str__(self):
+        return f'{self.trail.name} reviewed by {self.user.email}'
