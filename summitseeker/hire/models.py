@@ -3,8 +3,8 @@ from django.db import models
 class Trail(models.Model):
     name = models.CharField(max_length=30)
     image = models.ImageField(upload_to='trailphotos/',max_length=200,null=True,blank=True)
-    guides = models.ManyToManyField('user.Guide',through='GuideTrail')
     reviews = models.ManyToManyField('user.User',through='reviews.TrailReviews')
+    days = models.IntegerField()
     # Following will be gotten from aggregate funcs. on another table.
     # average_days = models.IntegerField()
     # average_difficulty = models.IntegerField()
@@ -17,6 +17,7 @@ class Trail(models.Model):
 class GuideTrail(models.Model):
     guide = models.ForeignKey('user.Guide',on_delete= models.CASCADE)
     trail = models.ForeignKey('Trail',on_delete=models.CASCADE)
+    money_rate = models.FloatField(default=1000)
     # count,avg_rate,others will be grabbed from using aggregate function on
     # hire table
     class Meta:
@@ -44,7 +45,7 @@ class Hire(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     # default = 3 days from initial book time.
-    deadline = models.DateField()
+    deadline = models.IntegerField()
     status = models.CharField(choices = cases,max_length=2)
     money_rate = models.FloatField()
 

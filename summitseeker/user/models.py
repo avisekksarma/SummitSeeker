@@ -97,6 +97,7 @@ class Guide(models.Model):
     total_trek_count = models.IntegerField(default=0)
     availability = models.BooleanField(default=True)
     reviews = models.ManyToManyField('Tourist',through='reviews.GuideReviews')
+    trails = models.ManyToManyField('hire.Trail',through='hire.GuideTrail')
 
     def __str__(self):
         return f'{self.user.email}-{self.user.id}-{self.id}'

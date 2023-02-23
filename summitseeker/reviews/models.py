@@ -41,7 +41,6 @@ class TrailReviews(models.Model):
     user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     comment = models.TextField()
     rating = models.FloatField()
-    days = models.IntegerField()
     difficulty = models.IntegerField()
 
     class Meta:
