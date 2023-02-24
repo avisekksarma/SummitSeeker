@@ -30,7 +30,8 @@ DEBUG = False
 
 #ALLOWED_HOSTS = ['74.225.249.44','127.0.0.1']
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['http://74.225.249.44']
+CSRF_TRUSTED_ORIGINS = ['http://74.225.249.44',
+                        'https://developer.mozilla.org']
 # Application definition
 
 INSTALLED_APPS = [
