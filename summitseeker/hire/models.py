@@ -45,7 +45,7 @@ class Hire(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     # default = 3 days from initial book time.
-    deadline = models.IntegerField()
+    deadLine = models.IntegerField(default = 3)
     status = models.CharField(choices = cases,max_length=2)
     money_rate = models.FloatField()
 
