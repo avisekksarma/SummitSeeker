@@ -1,0 +1,26 @@
+name: Azure Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Azure VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: 74.225.249.44
+          username: avisek
+          key: ${{ secrets.AZURE_VM_PRIVATE_KEY }}
+          script: |
+            cd /var/www/summitseeker
+            git pull origin main
+            cd summitseeker
+            python3 manage.py makemigrations
+            python3 manage.py migrate
+            python3 manage.py collectstatic --noinput
+            sudo systemctl restart django
