@@ -2,6 +2,7 @@ from django.db import models
 
 class Trail(models.Model):
     name = models.CharField(max_length=30)
+    mapImage = models.ImageField(upload_to='trailphotos/mapImage/',max_length=200,null=True,blank=True)
     image = models.ImageField(upload_to='trailphotos/',max_length=200,null=True,blank=True)
     reviews = models.ManyToManyField('user.User',through='reviews.TrailReviews')
     days = models.IntegerField()
