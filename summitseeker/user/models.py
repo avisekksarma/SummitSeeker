@@ -37,7 +37,7 @@ class UserManager(auth_models.BaseUserManager):
         
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
-        user.set_password(password)
+        user.make_password(password)
         user.is_active = True
         user.save(using=self._db)
         return user
