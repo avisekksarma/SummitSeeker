@@ -106,6 +106,14 @@ As always Follow these:
 
 #### II. Requiring authentication credentials:
 
+###### Info about the user:
+
+Accepts GET request only
+
+/api/user/profile
+
+
+
 ###### Info about Trail and Guides:
 
 3. /api/trails/
