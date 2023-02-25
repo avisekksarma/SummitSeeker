@@ -4,7 +4,7 @@ from rest_framework import serializers
 class TrailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trail
-        fields = ['id','name','image']
+        fields = ['id','name','image','mapImage','days']
 
 class GuideTrailSerializer(serializers.ModelSerializer):
     class Meta:
