@@ -125,10 +125,8 @@ class UserLogin(APIView):
         print(request.data)
         print(type(request.data))
         if not (request.data.get('email',False) and request.data.get('password',False)):
-            error ={
-                'message':'Email and/or password field is empty.',
-            }
-            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            res = makeResponse('Email and/or password field is empty.')
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = User.objects.get(email=request.data.get('email'),password=request.data.get('password'))
@@ -137,19 +135,17 @@ class UserLogin(APIView):
                 data = {
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
-                    'message': 'User login done Successfully',
                     'id': user.id,
                     'email': user.email,
                 }
-                return Response(data, status=status.HTTP_200_OK)
+                res = makeResponse('User login done Successfully',True,data=data)
+                return Response(res, status=status.HTTP_200_OK)
             else:
                 print("-------raised User doesn't exist error -----------")
                 raise User.DoesNotExist
         except User.DoesNotExist:
-            error = {
-                'message':'Invalid username and/or password',
-            }
-            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            res = makeResponse('Invalid username and/or password')
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
 
 # for now the logout will be handled in client side 
 #  by deleting the access,refresh token, but in reality
