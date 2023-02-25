@@ -22,6 +22,9 @@ Response:
 
 ```
 As always Follow these:
+  Check for 'token_invalid' in response:
+    if True redirect to login page
+    if False go for next step
   Check for 'success' in response:
     a. if True, read 'data'
     b. if False, read 'validation_error':
