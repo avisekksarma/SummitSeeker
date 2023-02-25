@@ -22,6 +22,10 @@ def log(val,delim="-"):
         print(delim,end='')
     print()
 
+
+# if success then read data,
+# if success = False, then if validation_error = True, then read errors
+# else if validation = False, then read message
 def makeResponse(message='',isSuccess=False,data=None,validation_error=False,**kwargs):
     response = {
         "message":message,

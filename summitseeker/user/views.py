@@ -6,6 +6,7 @@ from rest_framework import status
 from django.http import Http404
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from .permissions import IsTourist,IsGuide
+from utils import makeResponse
 from utils import log
 # from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -75,9 +76,8 @@ class UserRegister(APIView):
         print(userType)
         if not (userType and userType in get_user_types()):
             print(userType)
-            return Response({
-                'message':'"userType" field not set or set to invalid value'
-            },status=status.HTTP_400_BAD_REQUEST)
+            res = makeResponse('"userType" field not set or set to invalid value',False)
+            return Response(res,status=status.HTTP_400_BAD_REQUEST)
         
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -91,7 +91,8 @@ class UserRegister(APIView):
                     user.save()
                     serializer1.save(user=user)
                 else:
-                    return Response(serializer1.errors, status=status.HTTP_400_BAD_REQUEST)
+                    res = makeResponse('Error invalid request',validation_error=True,errors=serializer1.errors)
+                    return Response(res, status=status.HTTP_400_BAD_REQUEST)
             if userType == 'GD':
                 # case: Tourist
                 guide_data = makeGuideData(request.data)
@@ -102,18 +103,20 @@ class UserRegister(APIView):
                     user.save()
                     serializer1.save(user=user)
                 else:
-                    return Response(serializer1.errors, status=status.HTTP_400_BAD_REQUEST)
+                    res = makeResponse('Error invalid request',validation_error=True,errors=serializer1.errors)
+                    return Response(res, status=status.HTTP_400_BAD_REQUEST)
 
             # TODO: make user register only by valid email, i.e. say otp
-            data ={
-                'message':'User registered Successfully',
+            data = {
                 'id':user.id,
                 'email':user.email,
-                'userType':request.data['userType']
+                'userType':request.data['userType'],
             }
-            return Response(data,status=status.HTTP_201_CREATED)
+            res = makeResponse('User registered Successfully',True,data=data)
+            return Response(res,status=status.HTTP_201_CREATED)
         # return Response({"done":"yes"},status.HTTP_200_OK)
         else:
+            makeResponse(message='Errors in validation',validation_error=True, errors=serializer.errors)
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class UserLogin(APIView):
@@ -154,15 +157,32 @@ class UserLogin(APIView):
 #  way is blacklisting the tokens ,but for now i leave it.
         
 class UserDetail(APIView):
+    permission_classes = [IsAuthenticated]
     def get_obj_by_pk(self,pk):
         try:
             return User.objects.get(pk=pk)
         except User.DoesNotExist:
-            raise Http404
+            
+            raise 
     def get(self,request,pk):
         user = self.get_obj_by_pk(pk)
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+class Profile(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        serializer = UserSerializer(request.user)
+        serializer1 = dict(serializer.data)
+        if request.user.userType == 'TR':
+            serializer1['trekking_experience'] = request.user.tourist.trekking_experience
+        elif request.user.userType == 'GD':
+            serializer1['total_trek_count'] = request.user.guide.total_trek_count
+            serializer1['availability'] = request.user.guide.availability
+        res = makeResponse('Shown profile of user',True,data=serializer1)
+        return Response(res,status=status.HTTP_200_OK)
+
+
 
 class Hello(APIView):
     permission_classes = [IsAuthenticated]
@@ -173,3 +193,4 @@ class Hello(APIView):
             {'message':f'hi {y} is a {x}!!!'}
         ]
         return Response(data,status.HTTP_200_OK)
+    
