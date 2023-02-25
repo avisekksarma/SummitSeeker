@@ -15,6 +15,23 @@ Steps:
 
 
 ## API Documentation:
+
+#### API Response is in following same format:
+
+Response:
+
+```
+As always Follow these:
+  Check for 'success' in response:
+    a. if True, read 'data'
+    b. if False, read 'validation_error':
+          a. if 'validation_error' is True, then read 'errors' to show errors to user
+          b. if 'validation_error' is False, then read 'message' to show popup to user
+
+```
+
+
+
 #### I.  Not requiring previous authentication credentials:
 
 ###### User Authentication:
@@ -89,22 +106,19 @@ availability = [ boolean (True/False) ] [ default = True ]
 
 ---
 
-Response:
-
-```
-As always Follow these:
-  Check for 'success' in response:
-    a. if True, read 'data'
-    b. if False, read 'validation_error':
-          a. if 'validation_error' is True, then read 'errors' to show errors to user
-          b. if 'validation_error' is False, then read 'message' to show popup to user
-
-```
 
 
 2. /api/user/login
 
 #### II. Requiring authentication credentials:
+
+###### Info about the user:
+
+Accepts GET request only
+
+/api/user/profile
+
+
 
 ###### Info about Trail and Guides:
 
