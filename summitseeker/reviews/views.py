@@ -43,6 +43,9 @@ def manage_guide_review(request, pk):
     elif request.method == "POST":
         # review made by tourist to guide after their hiring/booking confirmed
         request.data['guide'] = pk
+        if request.user.userType != 'TR':
+            res = makeResponse('Cannot make review on guide by user who is not tourist')
+            return Response(res,status=status.HTTP_403_FORBIDDEN)
         serializer = GuideReviewsSerializer(data=request.data)
         if serializer.is_valid():
             try:

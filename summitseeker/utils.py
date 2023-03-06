@@ -20,11 +20,13 @@ def custom_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
     response = exception_handler(exc, context)
+    print(response.status_code)
     # Now add the HTTP status code to the response.
-    if response is not None and response.data['code']=='token_not_valid':
+    if response is not None and response.data.get('code')=='token_not_valid':
         res = makeResponse('Token invalid/expired',token_invalid=True)
         response.data = res
-    elif response is not None:
+        return response
+    if response is not None:
         response.data['success'] = False 
     # if response.data.get('')
     return response
