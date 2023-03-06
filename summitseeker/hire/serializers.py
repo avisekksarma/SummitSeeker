@@ -1,5 +1,6 @@
 from .models import Trail,Hire,GuideTrail
 from rest_framework import serializers
+from user.serializers import GuideSerializer
 
 class TrailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,9 +8,10 @@ class TrailSerializer(serializers.ModelSerializer):
         fields = ['id','name','image','mapImage','days']
 
 class GuideTrailSerializer(serializers.ModelSerializer):
+    guide = GuideSerializer()
     class Meta:
         model = GuideTrail
-        fields = '__all__'
+        fields = ['id','guide','money_rate']
         extra_kwargs = {
             'guide': {'required': True},
             'trail': {'required': True}

@@ -10,6 +10,7 @@ from utils import makeResponse
 from utils import log
 # from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.hashers import check_password
 
 class UserList(APIView):
     permission_classes = [IsAuthenticated]
@@ -58,13 +59,13 @@ def makeTouristData(data):
     return x
 
 def makeGuideData(data):
-    log(data,delim="#")
     x = {}
     if data.get('total_trek_count') is not None:
         x['total_trek_count'] = data.get('total_trek_count')
     
     if data.get('availability') is not None:
         x['availability'] = data.get('availability')
+
     # TODO: add future fields here
     return x
 
@@ -94,7 +95,11 @@ class UserRegister(APIView):
                     res = makeResponse('Error invalid request',validation_error=True,errors=serializer1.errors)
                     return Response(res, status=status.HTTP_400_BAD_REQUEST)
             if userType == 'GD':
-                # case: Tourist
+                # case: Guide
+                # TODO: DOING HERE :
+                # if request.data.get('trek_routes',[]):
+                #     return Response('ok for now')
+
                 guide_data = makeGuideData(request.data)
                 serializer1 =GuideSerializer(data=guide_data)
                 if serializer1.is_valid():
@@ -129,22 +134,29 @@ class UserLogin(APIView):
             return Response(res, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.get(email=request.data.get('email'),password=request.data.get('password'))
-            if user is not None:
+            user = User.objects.get(email=request.data.get('email'))
+            print(request.data.get('password'))
+            if user is None:
+                print("-------raised User doesn't exist error -----------")
+                raise User.DoesNotExist
+            successfulLogin = check_password(request.data.get('password',''),user.password)
+            if successfulLogin:
                 refresh = RefreshToken.for_user(user)
                 data = {
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
                     'id': user.id,
-                    'email': user.email,
+                    'email': user.email
                 }
                 res = makeResponse('User login done Successfully',True,data=data)
                 return Response(res, status=status.HTTP_200_OK)
             else:
-                print("-------raised User doesn't exist error -----------")
-                raise User.DoesNotExist
+                # actually password is invalid
+                res = makeResponse('Invalid email and/or password')
+                return Response(res, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
-            res = makeResponse('Invalid username and/or password')
+            # actually email is invalid
+            res = makeResponse('Invalid email and/or password')
             return Response(res, status=status.HTTP_400_BAD_REQUEST)
 
 # for now the logout will be handled in client side 

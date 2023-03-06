@@ -7,7 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self,validated_data):
         language_data = validated_data.pop('languages')
-        user = User.objects.create(**validated_data)
+        user = User.objects.create_user(**validated_data)
         user.languages.add(*language_data)
         return user
     # TODO: For now, update is not supported
@@ -45,6 +45,7 @@ class TouristSerializer(serializers.ModelSerializer):
 
 
 class GuideSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
     def create(self, validated_data):
         print(validated_data)
         return Guide.objects.create(**validated_data)
