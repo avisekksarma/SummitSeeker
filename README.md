@@ -147,4 +147,5 @@ Accepts GET request only
 
 - /api/trails/<int:trail_id>/guides/<int:guide_id>/hire [ Accepts GET, POST ] 
 > GET: gets some useful default data to fill up in form before hiring that specific guide
+
 > POST: for making initial hire request to guide
