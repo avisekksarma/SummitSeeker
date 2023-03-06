@@ -37,7 +37,7 @@ As always Follow these:
 
 #### I.  Not requiring previous authentication credentials:
 
-###### User Authentication:
+##### User Authentication:
 
 1. /api/user/register
 
@@ -115,7 +115,7 @@ availability = [ boolean (True/False) ] [ default = True ]
 
 #### II. Requiring authentication credentials:
 
-###### Info about the user:
+##### Info about the user:
 
 Accepts GET request only
 
@@ -123,18 +123,28 @@ Accepts GET request only
 
 
 
-###### Info about Trail and Guides:
+##### Info about Trail and Guides:
 
-3. /api/trails/
-4. /api/trails/<int:trail_id>
-5. /api/trails/<int:trail_id>/guides
+- /api/trails/ [ Accepts GET ] 
+> Gets all the trails
+- /api/trails/<int:trail_id> [ Accepts GET ]
+> Gets detail trail info of a trail
+- /api/trails/<int:trail_id>/guides [ Accepts GET ] 
+> Gets all the guides available in a trail
 
-###### Info about Trail reviews:
+##### Info about Reviews:
 
-5. /api/reviews/trail/<int:trail_id>
-6. /api/reviews/guide/<int:guide_id>
-7. /api/reviews/guide/<int:guide_id>/review/check
+- /api/reviews/ [ Accepts GET ] 
+> Gets all the reviews of user himself/herself [ valid for both guide and tourist ]
+- /api/reviews/trail/<int:trail_id> [ Accepts GET , POST ]
+> Gets all reviews in a trail, also make a review in that trail
+- /api/reviews/guide/<int:guide_id> [ Accepts GET , POST ]
+> Gets all reviews of a guide and also make a review on a guide only by those tourists who have once gone with the guide
+- /api/reviews/guide/<int:guide_id>/review/check [ Accepts GET ]
+> Checks if the tourist has ever reviewed that specific guide or not
 
-###### Hiring guide:
+##### Hiring guide:
 
-8./api/trails/<int:trail_id>/guides/<int:guide_id>/hire
+- /api/trails/<int:trail_id>/guides/<int:guide_id>/hire [ Accepts GET, POST ] 
+> GET: gets some useful default data to fill up in form before hiring that specific guide
+> POST: for making initial hire request to guide
