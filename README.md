@@ -70,21 +70,21 @@ a. As Tourist:
 b. As Guide:
 ```
 {
-    "email": "liya@gmail.com",
-    "date_of_birth": "2001-03-22",
-    "gender": "F",
-    "nationality": "AF",
+    "email": "chris@gmail.com",
+    "date_of_birth": "2000-04-22",
+    "gender": "M",
+    "nationality": "KR",
     "password":"nepalGreat123",
-    "contactNum": 2222678662,
+    "contactNum": 128745673,
     "languages": [
-        "CN",
+        "EN",
         "JP"
     ],
-    "first_name": "liya",
-    "last_name": "pina",
+    "first_name": "Chris",
+    "last_name": "Lundstram",
     "userType":"GD",
-    "total_trek_count":12,
-    "availability":True
+    "total_trek_count":3,
+    "availability":true
 }
 ```
 
@@ -103,7 +103,7 @@ Optional in GD registration:
 
 ```
 total_trek_count = [number] [ default = 0 ]
-availability = [ boolean (True/False) ] [ default = True ]
+availability = [ boolean (true/false) ] [ default = true ]
 ```
 
 
