@@ -8,7 +8,7 @@ class TrailSerializer(serializers.ModelSerializer):
         fields = ['id','name','image','mapImage','days']
 
 class GuideTrailSerializer(serializers.ModelSerializer):
-    guide = GuideSerializer()
+    guide = GuideSerializer(required=True)
     class Meta:
         model = GuideTrail
         fields = ['id','guide','money_rate']

@@ -45,7 +45,7 @@ class TouristSerializer(serializers.ModelSerializer):
 
 
 class GuideSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializer(required=False)
     def create(self, validated_data):
         print(validated_data)
         return Guide.objects.create(**validated_data)
@@ -57,6 +57,4 @@ class GuideSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guide
         fields = ['id','user','total_trek_count','availability']
-        extra_kwargs = {
-            'user': {'required': False}
-        }
+        
