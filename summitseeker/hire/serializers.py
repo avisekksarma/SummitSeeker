@@ -13,7 +13,7 @@ class GuideTrailSerializer(serializers.ModelSerializer):
         model = GuideTrail
         fields = ['id','guide','money_rate']
         extra_kwargs = {
-            'guide': {'required': True},
+            'guide': {'required': False},
             'trail': {'required': True}
         }
         # depth= 1

@@ -1,7 +1,7 @@
-from .serializers import UserSerializer,TouristSerializer,GuideSerializer
+from .serializers import UserSerializer,TouristSerializer,GuideSerializer,LanguageSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import User
+from .models import User,Language
 from rest_framework import status
 from django.http import Http404
 from rest_framework.permissions import AllowAny,IsAuthenticated
@@ -11,6 +11,9 @@ from utils import log
 # from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
+from hire.serializers import GuideTrailSerializer
+from hire.models import Trail
+
 
 class UserList(APIView):
     permission_classes = [IsAuthenticated]
@@ -22,25 +25,6 @@ class UserList(APIView):
 # TODO: may be add features like email otp sending, forgot password, oauth later, check if
 # this login/logout is working
 
-
-# A valid form for registering user
-# {
-#     "id": 2,
-#     "email": "liya@gmail.com",
-#     "date_of_birth": "2001-03-22",
-#     "gender": "F",
-#     "nationality": "AF",
-#     "password":"nepalGreat123",
-#     "contactNum": 2222678662,
-#     "languages": [
-#         "CN",
-#         "JP"
-#     ],
-#     "first_name": "liya",
-#     "last_name": "pina",
-#     "userType":"TR",
-#     "experience":"B"
-# }
 
 
 def get_user_types():
@@ -97,16 +81,33 @@ class UserRegister(APIView):
             if userType == 'GD':
                 # case: Guide
                 # TODO: DOING HERE :
-                # if request.data.get('trek_routes',[]):
-                #     return Response('ok for now')
+                if request.data.get('trek_routes',[]):
+                    pass
+                else:
+                    trek_routes = request.data.get('trek_routes')
 
                 guide_data = makeGuideData(request.data)
                 serializer1 =GuideSerializer(data=guide_data)
                 if serializer1.is_valid():
                     user = serializer.save()
+                   
                     user.is_active = True
                     user.save()
-                    serializer1.save(user=user)
+                    guide = serializer1.save(user=user)
+                     # trek routes 
+                    for i in trek_routes:
+                        # i = { id: 1, money_rate: 2550 }
+                        trail = Trail.objects.get(pk=i.get('id'))
+                        if trail is None:
+                            continue
+                        data = {
+                            'trail':i.get('id'),
+                            'money_rate':i.get('money_rate',1000)
+                        }
+                        serializer2 = GuideTrailSerializer(data=data)
+                        if serializer2.is_valid():
+                            serializer2.save(guide=guide)
+                    # 
                 else:
                     res = makeResponse('Error invalid request',validation_error=True,errors=serializer1.errors)
                     return Response(res, status=status.HTTP_400_BAD_REQUEST)
@@ -188,6 +189,15 @@ class Profile(APIView):
             serializer1['total_trek_count'] = request.user.guide.total_trek_count
             serializer1['availability'] = request.user.guide.availability
         res = makeResponse('Shown profile of user',True,data=serializer1)
+        return Response(res,status=status.HTTP_200_OK)
+
+# return available languages
+class LanguageManager(APIView):
+    permission_classes = [AllowAny]
+    def get(self,request):
+        l = Language.objects.all()
+        languages = LanguageSerializer(l,many=True)
+        res = makeResponse('Got all languages',True,data=languages.data)
         return Response(res,status=status.HTTP_200_OK)
 
 

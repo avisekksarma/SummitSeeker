@@ -27,7 +27,8 @@ def get_my_reviews(request):
         # case user is Tourist
         reviews = GuideReviews.objects.filter(guide=request.user.guide.id)
         serializer = GuideReviewsSerializer(reviews, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    res = makeResponse("Gotten all user's reviews",isSuccess=True,data=serializer.data)
+    return Response(res, status=status.HTTP_200_OK)
 
 # You are a tourist and want to see all reviews of a certain guide.
 
@@ -39,7 +40,8 @@ def manage_guide_review(request, pk):
     if request.method == "GET":
         reviews = GuideReviews.objects.filter(guide=pk)
         serializer = GuideReviewsSerializer(reviews, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        res = makeResponse('Gotten all reviews of requested guide',True,data=serializer.data)
+        return Response(res, status=status.HTTP_200_OK)
     elif request.method == "POST":
         # review made by tourist to guide after their hiring/booking confirmed
         request.data['guide'] = pk
@@ -51,18 +53,13 @@ def manage_guide_review(request, pk):
             try:
                 serializer.save(tourist=request.user.tourist)
             except IntegrityError:
-                data = {
-                    'message': "You can't review the same guide twice",
-                    'success': False
-                }
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
-            data = {
-                'message': 'Successfully reviewed of the guide',
-                'success': True
-            }
-            return Response(data, status=status.HTTP_200_OK)
+                res = makeResponse("You can't review the same guide twice")
+                return Response(res, status=status.HTTP_400_BAD_REQUEST)
+            res = makeResponse('Successfully reviewed of the guide')
+            return Response(res, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            res = makeResponse(validation_error=True,errors=serializer.errors)
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -71,19 +68,17 @@ def have_i_reviewed(request, pk):
     tourist = request.user.tourist
     try:
         review = GuideReviews.objects.get(tourist=tourist, guide=pk)
-        data = {
-            'message': 'Reviewed till now',
-            'success': True,
+        response = {
             'reviewed': True
         }
-        return Response(data, status=status.HTTP_200_OK)
+        res = makeResponse('Reviewed till now',isSuccess=True,data=response)
+        return Response(res, status=status.HTTP_200_OK)
     except GuideReviews.DoesNotExist as e:
-        data = {
-            'message': 'Not reviewed till now',
-            'success': True,
+        response = {
             'reviewed': False
         }
-        return Response(data, status=status.HTTP_200_OK)
+        res = makeResponse('Not reviewed till now',isSuccess=True,data=response)
+        return Response(res, status=status.HTTP_200_OK)
 
 
 # get all reviews of a trail,
@@ -113,14 +108,16 @@ def trail_reviews(request, trail_id):
                 'No such trail exist with given id')
                 return Response(res, status=status.HTTP_400_BAD_REQUEST)
             try:
-                serializer.save(user=request.user,trail=trail)
-                res = makeResponse('Successfully reviewed trail',True)
+                review = serializer.save(user=request.user,trail=trail)
+                res = makeResponse('Successfully reviewed trail',True,data={
+                    'id':review.id
+                })
                 return Response(res, status=status.HTTP_200_OK)
             except IntegrityError:
                 res = makeResponse('You cannot review same trail twice')
                 return Response(res, status=status.HTTP_400_BAD_REQUEST)
         else:
-            res = makeResponse('Error invalid request',errors=serializer.errors,validation_error=True)
+            res = makeResponse('Error invalid request',validation_error=True,errors=serializer.errors)
             return Response(res,status=status.HTTP_400_BAD_REQUEST)
 
 
