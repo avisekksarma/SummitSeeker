@@ -113,6 +113,10 @@ availability = [ boolean (true/false) ] [ default = true ]
 
 2. /api/user/login
 
+3. /api/languages [ Accepts GET ]
+> Gets all the available languages 
+
+
 #### II. Requiring authentication credentials:
 
 ##### Info about the user:
