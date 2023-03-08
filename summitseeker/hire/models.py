@@ -36,7 +36,6 @@ class Hire(models.Model):
         ('RQ','Requested'),
         ('AC','Accepted'),
         ('RJ','Rejected'),
-        ('NG','Negotiate'),
         ('HR','Hired')
     ]
     # TODO: make sure to manage cases when same tourist requests same guide on same trail , other cases in like same time maybe

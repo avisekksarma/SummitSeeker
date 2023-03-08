@@ -8,9 +8,10 @@ from user.permissions import IsTourist,IsGuide
 from user.models import Guide
 from utils import makeResponse
 from reviews.models import TrailReviews
-from .models import GuideTrail,Trail
+from .models import GuideTrail,Trail,Hire
 from django.db.models import Avg
-
+from datetime import datetime,timedelta
+from utils import log
 
 class TrailListView(APIView):
     # permission_classes = [AllowAny]
@@ -49,18 +50,43 @@ class TrailDetailView(APIView):
 
 class GuidesOnTrail(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self,request,trail_id):
+    def post(self,request,trail_id):
         try:
             trail = Trail.objects.get(pk=trail_id)
+            # request.data needs to have start_date
+            start_date = request.data.get('start_date',None)
+            if start_date is None:
+                res = makeResponse('start_date is not passed in request body')
+                return Response(res, status=status.HTTP_400_BAD_REQUEST)
+            req_start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            req_end_date = req_start_date + timedelta(days = trail.days)
+            
             objects = GuideTrail.objects.filter(trail=trail)
-            serializer = GuideTrailSerializer(objects,many=True)
+            available_guide_trail = []
+            for i in objects:
+                if i.guide.availability == True:
+                    hireObjects = Hire.objects.filter(guide = i.guide,status='HR')
+                    for j in hireObjects:
+                        # log(j.trail.id,delim='&')
+                        days = Trail.objects.get(pk=j.trail.id).days
+                        # log(days)
+                        hired_end_date = j.start_date + timedelta(days=days)
+                        if (req_start_date <= hired_end_date and hired_end_date <= req_end_date) or (j.start_date >= req_start_date and j.start_date<=req_end_date):
+                            # not available case:
+                            # log('broken',delim='%#%')
+                            break
+                    else:
+                    # availablilty = True and not hired in requested date
+                        available_guide_trail.append(i)
+
+            serializer = GuideTrailSerializer(available_guide_trail,many=True)
             res = makeResponse('Got all guides',True,serializer.data)
             return Response(res,status= status.HTTP_200_OK)
         except Trail.DoesNotExist:
             res = makeResponse('No such trail exists')
             return Response(res,status=status.HTTP_400_BAD_REQUEST)
 
-class Hire(APIView):
+class HireView(APIView):
     permission_classes = [IsAuthenticated,IsTourist]
     def post(self,request,trail_id,guide_id):
         # path is like = /api/trails/1/guides/10/hire
