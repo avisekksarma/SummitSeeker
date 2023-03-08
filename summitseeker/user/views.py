@@ -32,7 +32,6 @@ def get_user_types():
     x =[]
     for i in val:
         x.append(i[0])
-    log(x,delim="@")
     return x
 
 def makeTouristData(data):
@@ -81,8 +80,9 @@ class UserRegister(APIView):
             if userType == 'GD':
                 # case: Guide
                 # TODO: DOING HERE :
-                if request.data.get('trek_routes',[]):
-                    pass
+                if not request.data.get('trek_routes',None):
+                    res = makeResponse(validation_error=True,errors={'trek_routes': ['This field is required']})
+                    return Response(res,status=status.HTTP_400_BAD_REQUEST)
                 else:
                     trek_routes = request.data.get('trek_routes')
 
@@ -102,11 +102,16 @@ class UserRegister(APIView):
                             continue
                         data = {
                             'trail':i.get('id'),
-                            'money_rate':i.get('money_rate',1000)
+                            'money_rate':i.get('money_rate',1000),
                         }
+                        print(data)
                         serializer2 = GuideTrailSerializer(data=data)
                         if serializer2.is_valid():
                             serializer2.save(guide=guide)
+                        else:
+                            res = makeResponse(
+                                'Error invalid request', validation_error=True, errors=serializer2.errors)
+                            return Response(res, status=status.HTTP_400_BAD_REQUEST)
                     # 
                 else:
                     res = makeResponse('Error invalid request',validation_error=True,errors=serializer1.errors)
@@ -122,8 +127,8 @@ class UserRegister(APIView):
             return Response(res,status=status.HTTP_201_CREATED)
         # return Response({"done":"yes"},status.HTTP_200_OK)
         else:
-            makeResponse(message='Errors in validation',validation_error=True, errors=serializer.errors)
-            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            res = makeResponse(message='Errors in validation',validation_error=True, errors=serializer.errors)
+            return Response(res,status=status.HTTP_400_BAD_REQUEST)
 
 class UserLogin(APIView):
     permission_classes =[AllowAny]

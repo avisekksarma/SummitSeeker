@@ -8,13 +8,15 @@ class TrailSerializer(serializers.ModelSerializer):
         fields = ['id','name','image','mapImage','days']
 
 class GuideTrailSerializer(serializers.ModelSerializer):
-    guide = GuideSerializer(required=True)
+    guide = GuideSerializer(required=False)
     class Meta:
         model = GuideTrail
-        fields = ['id','guide','money_rate']
+        # fields = ['id','guide','money_rate']
+        fields ='__all__'
         extra_kwargs = {
-            'guide': {'required': False},
-            'trail': {'required': True}
+            'guide':{'required':False},
+            'trail': {'required': True},
+            'money_rate':{'required':False}
         }
         # depth= 1
 
