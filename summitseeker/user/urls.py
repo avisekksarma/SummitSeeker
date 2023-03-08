@@ -10,4 +10,5 @@ urlpatterns = [
     path('user/hello/',views.Hello.as_view(),name='user-hello'),
     path('languages/',views.LanguageManager.as_view(),name='languages'),
     path('countries/',views.CountriesList.as_view(),name='countries'),
+    path('user/notifications/',views.TouristNotification.as_view(),name='tourist-notification'),
 ]

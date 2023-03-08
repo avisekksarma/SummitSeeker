@@ -23,6 +23,8 @@ class GuideTrailSerializer(serializers.ModelSerializer):
 from datetime import datetime,timedelta
 
 class HireSerializer(serializers.ModelSerializer):
+    guide = GuideSerializer()
+    trail = TrailSerializer()
     def create(self,validated_data):
         print('-----------------fdfda-------------')
         print(validated_data)

@@ -10,7 +10,7 @@ from utils import makeResponse
 from reviews.models import TrailReviews
 from .models import GuideTrail,Trail,Hire
 from django.db.models import Avg
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,date
 from utils import log
 
 class TrailListView(APIView):
@@ -113,4 +113,5 @@ class HireView(APIView):
         except GuideTrail.DoesNotExist:
             res = makeResponse('Provided guide does not go in that trial')
             return Response(res,status=status.HTTP_400_BAD_REQUEST)
-        
+
+

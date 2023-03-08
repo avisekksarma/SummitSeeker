@@ -11,9 +11,12 @@ from utils import log
 # from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
-from hire.serializers import GuideTrailSerializer
-from hire.models import Trail
+from hire.serializers import GuideTrailSerializer,HireSerializer
+from hire.models import Trail,Hire
 from django_countries import countries
+from datetime import date
+
+
 
 class UserList(APIView):
     permission_classes = [IsAuthenticated]
@@ -218,8 +221,6 @@ class LanguageManager(APIView):
         res = makeResponse('Got all languages',True,data=languages.data)
         return Response(res,status=status.HTTP_200_OK)
 
-
-
 class Hello(APIView):
     permission_classes = [IsAuthenticated]
     def get(self,request):
@@ -229,4 +230,32 @@ class Hello(APIView):
             {'message':f'hi {y} is a {x}!!!'}
         ]
         return Response(data,status.HTTP_200_OK)
-    
+
+# class RecommendedTrail(APIView):
+#     permission_classes = [IsAuthenticated,IsTourist]
+#     def get(self,request):
+#         hireObjects = Hire.objects.filter(tourist = request.user.tourist.id,status='HR')
+#         min = 99999
+#         max = -99999
+#         for i in hireObjects:
+#             if i.trail.days < min:
+                
+
+
+class TouristNotification(APIView):
+    # sends all inquired and accepted guides for that user
+    permission_classes = [IsAuthenticated,IsTourist]
+    def get(self,request):
+        today = date.today()
+        all_hires = Hire.objects.filter(tourist=request.user.tourist.id,start_date__gte=today)
+        serializer = HireSerializer(all_hires,many=True)
+        accepted = []
+        for i in serializer.data:
+            if i['status'] == 'AC':
+                accepted.append(i)
+        data = {
+            'Accepted':accepted,
+            'All':serializer.data
+        }
+        response = makeResponse('Successfully gotten all notification',True,data)
+        return Response(response,status = status.HTTP_200_OK)

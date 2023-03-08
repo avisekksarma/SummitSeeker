@@ -1,11 +1,18 @@
 from django.db import models
 
 class Trail(models.Model):
+    # difficulty_choices =[
+    #     ('N','Never Done'),
+    #     ('B','Beginner'),
+    #     ('S','Seasoned'),
+    #     ('P','Professional')
+    # ]
     name = models.CharField(max_length=30)
     mapImage = models.ImageField(upload_to='trailphotos/mapImage/',max_length=200,null=True,blank=True)
     image = models.ImageField(upload_to='trailphotos/',max_length=200,null=True,blank=True)
     reviews = models.ManyToManyField('user.User',through='reviews.TrailReviews')
     days = models.IntegerField()
+    # difficulty = models.CharField(choices=difficulty_choices)
     # Following will be gotten from aggregate funcs. on another table.
     # average_days = models.IntegerField()
     # average_difficulty = models.IntegerField()
