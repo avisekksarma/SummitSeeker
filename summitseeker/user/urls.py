@@ -9,4 +9,5 @@ urlpatterns = [
     path('user/login/',views.UserLogin.as_view(),name='user-login'),
     path('user/hello/',views.Hello.as_view(),name='user-hello'),
     path('languages/',views.LanguageManager.as_view(),name='languages'),
+    path('countries/',views.CountriesList.as_view(),name='countries'),
 ]

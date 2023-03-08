@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
 from hire.serializers import GuideTrailSerializer
 from hire.models import Trail
-
+from django_countries import countries
 
 class UserList(APIView):
     permission_classes = [IsAuthenticated]
@@ -25,6 +25,19 @@ class UserList(APIView):
 # TODO: may be add features like email otp sending, forgot password, oauth later, check if
 # this login/logout is working
 
+
+class CountriesList(APIView):
+    permission_classes = [AllowAny]
+    def get(self,request):
+        countries_dict = dict(countries)
+        data = []
+        for code, name in list(countries)[:]:
+            data.append({
+                'countryCode':code,
+                'countryName':name
+            })
+        res = makeResponse('Gotten all countries',True,data=data)
+        return Response(res,status=status.HTTP_200_OK)
 
 
 def get_user_types():
