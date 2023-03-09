@@ -120,8 +120,15 @@ Accepts GET request only
 > Gets all the trails
 - /api/trails/<int:trail_id> [ Accepts GET ]
 > Gets detail trail info of a trail
-- /api/trails/<int:trail_id>/guides [ Accepts GET ] 
+- /api/trails/<int:trail_id>/guides [ Accepts POST ] 
 > Gets all the guides available in a trail
+```
+
+{
+    "start_date":"2023-04-10"
+}
+
+```
 
 ##### Info about Reviews:
 
