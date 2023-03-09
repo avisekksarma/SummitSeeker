@@ -147,3 +147,10 @@ Accepts GET request only
 > GET: gets some useful default data to fill up in form before hiring that specific guide
 
 > POST: for making initial hire request to guide
+
+
+##### Geting notification:
+
+- /api/user/notifications/  [ Accepts GET only ]
+
+> All: has every notification except 'accepted', and 'Accepted' has only accepted notifications

@@ -113,7 +113,7 @@ class HireView(APIView):
                     'guide_id':hire_obj.guide.id,
                     'tourist':hire_obj.tourist.user.email
                 }
-                res = makeResponse('Successfully hired',True,data=data)
+                res = makeResponse('Successfully requested to guide',True,data=data)
                 
                 return Response(res,status=status.HTTP_201_CREATED)
             else:

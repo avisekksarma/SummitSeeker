@@ -250,12 +250,15 @@ class TouristNotification(APIView):
         all_hires = Hire.objects.filter(tourist=request.user.tourist.id,start_date__gte=today)
         serializer = HireSerializer(all_hires,many=True)
         accepted = []
+        others = []
         for i in serializer.data:
             if i['status'] == 'AC':
                 accepted.append(i)
+            else:
+                others.append(i)
         data = {
             'Accepted':accepted,
-            'All':serializer.data
+            'All':others
         }
         response = makeResponse('Successfully gotten all notification',True,data)
         return Response(response,status = status.HTTP_200_OK)
