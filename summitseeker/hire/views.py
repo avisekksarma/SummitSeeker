@@ -89,6 +89,7 @@ class GuidesOnTrail(APIView):
 class HireView(APIView):
     permission_classes = [IsAuthenticated,IsTourist]
     def post(self,request,trail_id,guide_id):
+        print(request.path)
         # path is like = /api/trails/1/guides/10/hire
         # TODO: make strict rules on when hiring can be done like stopping repeated hire requests
         try:
@@ -97,7 +98,20 @@ class HireView(APIView):
             trail = Trail.objects.get(pk=trail_id)
             serializer = HireSerializer(data = request.data)
             if serializer.is_valid():
-                serializer.save(guide = guide, trail = trail,tourist = request.user.tourist)
+                hire_obj = serializer.save(guide = guide, trail = trail,tourist = request.user.tourist)
+                data = {
+                    'hire_id': hire_obj.id,
+                    'guide':hire_obj.guide.user.email,
+                    'guide_id':hire_obj.guide.id,
+                    'tourist':hire_obj.tourist.user.email
+                }
+                res = makeResponse('Successfully hired',True,data=data)
+                
+                return Response(res,status=status.HTTP_201_CREATED)
+            else:
+                res = makeResponse('Invalid data sent in request',validation_error=True,errors=serializer.errors)
+                return Response(res,status=status.HTTP_200_OK)
+
         except GuideTrail.DoesNotExist:
             res = makeResponse('Provided guide does not go in that trial')
             return Response(res,status=status.HTTP_400_BAD_REQUEST)

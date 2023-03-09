@@ -1,6 +1,7 @@
 from .models import Trail,Hire,GuideTrail
 from rest_framework import serializers
 from user.serializers import GuideSerializer
+from utils import log
 
 class TrailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,8 +24,8 @@ class GuideTrailSerializer(serializers.ModelSerializer):
 from datetime import datetime,timedelta
 
 class HireSerializer(serializers.ModelSerializer):
-    guide = GuideSerializer()
-    trail = TrailSerializer()
+    guide = GuideSerializer(required=False)
+    trail = TrailSerializer(required=False)
     def create(self,validated_data):
         print('-----------------fdfda-------------')
         print(validated_data)
@@ -33,7 +34,9 @@ class HireSerializer(serializers.ModelSerializer):
         validated_data['end_date'] = validated_data['start_date']+timedelta(days = validated_data['trail'].days)
         print(validated_data)
         print('-----------------fdfda-------------')
-        return Hire.objects.create(**validated_data)
+        hire = Hire.objects.create(**validated_data)
+        log(hire.deadLine,delim='%&')
+        return hire
     
     class Meta:
         model = Hire
@@ -50,7 +53,7 @@ class HireSerializer(serializers.ModelSerializer):
             'trail': {'required': False, 'read_only': True},
             'start_date': {'required': True},
             'end_date': {'required': False,'read_only':True},
-            'deadline': {'required': True},
+            'deadLine': {'required': True},
             'status':{'required':True},
             'money_rate':{'required':True}
         }

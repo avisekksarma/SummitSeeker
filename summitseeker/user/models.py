@@ -100,7 +100,7 @@ class Guide(models.Model):
     trails = models.ManyToManyField('hire.Trail',through='hire.GuideTrail')
 
     def __str__(self):
-        return f'{self.user.email}-{self.user.id}-{self.id}'
+        return f'{self.user.email}-{self.id}'
 
 class Tourist(models.Model):
     exp =[
@@ -115,5 +115,5 @@ class Tourist(models.Model):
     # visited_trails = models
 
     def __str__(self):
-        return self.user.email
+        return f'{self.user.email}-{self.id}'
 
