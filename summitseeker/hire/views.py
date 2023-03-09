@@ -61,9 +61,18 @@ class GuidesOnTrail(APIView):
             req_start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
             req_end_date = req_start_date + timedelta(days = trail.days)
             
-            objects = GuideTrail.objects.filter(trail=trail)
+            allGuidesOnTrail = GuideTrail.objects.filter(trail=trail)
+            possibleGuidesOnTrail = []
+            today = date.today()
+            for i in allGuidesOnTrail:
+                try:
+                    Hire.objects.get(trail=trail.id,guide=i.guide.id,tourist=request.user.tourist.id,status='RQ',start_date__gte=today)
+                    # this guide on same trail has been requested by me(tourist)
+                except:
+                    possibleGuidesOnTrail.append(i)
+                    
             available_guide_trail = []
-            for i in objects:
+            for i in possibleGuidesOnTrail:
                 if i.guide.availability == True:
                     hireObjects = Hire.objects.filter(guide = i.guide,status='HR')
                     for j in hireObjects:
@@ -78,7 +87,6 @@ class GuidesOnTrail(APIView):
                     else:
                     # availablilty = True and not hired in requested date
                         available_guide_trail.append(i)
-
             serializer = GuideTrailSerializer(available_guide_trail,many=True)
             res = makeResponse('Got all guides',True,serializer.data)
             return Response(res,status= status.HTTP_200_OK)
