@@ -239,26 +239,78 @@ class Hello(APIView):
 #         max = -99999
 #         for i in hireObjects:
 #             if i.trail.days < min:
-                
+# 
 
-
-class TouristNotification(APIView):
-    # sends all inquired and accepted guides for that user
+class CancelRequest(APIView):
     permission_classes = [IsAuthenticated,IsTourist]
-    def get(self,request):
-        today = date.today()
-        all_hires = Hire.objects.filter(tourist=request.user.tourist.id,start_date__gte=today)
-        serializer = HireSerializer(all_hires,many=True)
-        accepted = []
-        others = []
-        for i in serializer.data:
-            if i['status'] == 'AC':
-                accepted.append(i)
+    def get(self,hire_id):
+        try:
+            hireObj = Hire.objects.get(pk=hire_id)
+            if hireObj.status == 'RQ':
+                hireObj.delete()
+                res = makeResponse('Succesfully cancelled request')
+                return Response(res,status=status.HTTP_200_OK)
             else:
-                others.append(i)
-        data = {
-            'Accepted':accepted,
-            'All':others
-        }
-        response = makeResponse('Successfully gotten all notification',True,data)
-        return Response(response,status = status.HTTP_200_OK)
+                res = makeResponse('No request sent in that hire id')
+                return Response(res,status=status.HTTP_400_BAD_REQUEST)
+        except:
+            res = makeResponse('Hire object of that id does not exist')
+            return Response(res,status=status.HTTP_400_BAD_REQUEST)
+
+class HireAcceptOrRejectView(APIView):
+    permission_classes = [IsAuthenticated, IsGuide]
+    def post(self, request,hire_id):
+        try:
+            hireObj = Hire.objects.get(pk=hire_id)
+            sent_status = request.data.get('status')
+            if sent_status and (sent_status == 'AC' or sent_status=='RJ'):
+                hireObj.status = sent_status
+                hireObj.save()
+                res = makeResponse('Updated successfully',data=hireObj)
+                return Response(res,status=status.HTTP_200_OK)
+            else:
+                res = makeResponse('Send "AC" or "RJ" in status')
+                return Response(res,status=status.HTTP_400_BAD_REQUEST)
+        except:
+            res = makeResponse('Hire object of that id does not exist')
+            return Response(res,status=status.HTTP_400_BAD_REQUEST)
+
+
+class Notification(APIView):
+    # sends all inquired and accepted guides for that user
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        if request.user.userType=='TR':
+            today = date.today()
+            all_hires = Hire.objects.filter(tourist=request.user.tourist.id,start_date__gte=today)
+            serializer = HireSerializer(all_hires,many=True)
+            accepted = []
+            others = []
+            for i in serializer.data:
+                if i['status'] == 'AC':
+                    accepted.append(i)
+                else:
+                    others.append(i)
+            data = {
+                'Accepted':accepted,
+                'All':others
+            }
+            response = makeResponse('Successfully gotten all notification',True,data)
+            return Response(response,status = status.HTTP_200_OK)
+        else:
+            today = date.today()
+            all_hires = Hire.objects.filter(guide=request.user.guide.id,start_date__gte=today)
+            serializer = HireSerializer(all_hires,many=True)
+            requested = []
+            others = []
+            for i in serializer.data:
+                if i['status'] == 'RQ':
+                    requested.append(i)
+                else:
+                    others.append(i)
+            data = {
+                'Requested':requested,
+                'All':others
+            }
+            response = makeResponse('Successfully gotten all notification',True,data)
+            return Response(response,status = status.HTTP_200_OK)

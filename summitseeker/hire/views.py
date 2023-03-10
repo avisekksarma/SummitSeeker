@@ -94,7 +94,7 @@ class GuidesOnTrail(APIView):
             res = makeResponse('No such trail exists')
             return Response(res,status=status.HTTP_400_BAD_REQUEST)
 
-class HireView(APIView):
+class InitialRequestView(APIView):
     permission_classes = [IsAuthenticated,IsTourist]
     def post(self,request,trail_id,guide_id):
         print(request.path)

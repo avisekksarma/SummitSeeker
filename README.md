@@ -153,4 +153,20 @@ Accepts GET request only
 
 - /api/user/notifications/  [ Accepts GET only ]
 
-> All: has every notification except 'accepted', and 'Accepted' has only accepted notifications
+> For Tourist: 'All' has every notification except 'accepted', and 'Accepted' has only accepted notifications
+
+> For Guide: 'All' has every notification except 'requested', and 'requested' has only requested notifications
+
+##### Accept or reject by guide:
+
+- /api/response/<int:hire_id>/ [ Accept POST only ]
+
+In request.body:
+
+```
+    status = 'AC' or 'RJ' [ for accept / reject a request of tourist]
+```
+
+##### Cancel request by tourist:
+
+- /api/user/cancelrequest/<int:hire_id> [ Accepts GET only ]
