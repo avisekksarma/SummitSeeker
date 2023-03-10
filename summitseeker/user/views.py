@@ -243,7 +243,7 @@ class Hello(APIView):
 
 class CancelRequest(APIView):
     permission_classes = [IsAuthenticated,IsTourist]
-    def get(self,hire_id):
+    def get(self,request,hire_id):
         try:
             hireObj = Hire.objects.get(pk=hire_id)
             if hireObj.status == 'RQ':
