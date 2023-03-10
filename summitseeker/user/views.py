@@ -248,7 +248,7 @@ class CancelRequest(APIView):
             hireObj = Hire.objects.get(pk=hire_id)
             if hireObj.status == 'RQ':
                 hireObj.delete()
-                res = makeResponse('Succesfully cancelled request')
+                res = makeResponse('Succesfully cancelled request',True)
                 return Response(res,status=status.HTTP_200_OK)
             else:
                 res = makeResponse('No request sent in that hire id')
