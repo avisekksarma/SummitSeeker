@@ -39,6 +39,7 @@ class UserSerializer(serializers.ModelSerializer):
                 'last_name','userType']
     
 class TouristSerializer(serializers.ModelSerializer):
+    user = UserSerializer(required=False)
     def create(self,validated_data):
         print(validated_data)
         return Tourist.objects.create(**validated_data)
