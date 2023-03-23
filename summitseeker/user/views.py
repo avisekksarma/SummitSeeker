@@ -14,9 +14,9 @@ from django.contrib.auth.hashers import check_password
 from hire.serializers import GuideTrailSerializer,HireSerializer
 from hire.models import Trail,Hire
 from django_countries import countries
-from datetime import date
+from datetime import date,timedelta
 import copy
-
+from django.db.models import Q
 
 
 
@@ -293,7 +293,7 @@ class HireAcceptOrRejectView(APIView):
             if sent_status and (sent_status == 'AC' or sent_status=='RJ'):
                 hireObj.status = sent_status
                 hireObj.save()
-                res = makeResponse('Updated successfully',data=hireObj)
+                res = makeResponse('Updated successfully',isSuccess=True,data=hireObj)
                 return Response(res,status=status.HTTP_200_OK)
             else:
                 res = makeResponse('Send "AC" or "RJ" in status')
@@ -322,6 +322,17 @@ class Notification(APIView):
                 'Accepted':accepted,
                 'All':others
             }
+
+            # Calculate the date 3 days from end_date
+            end_date_plus_three = date.today() + timedelta(days=3)
+
+            # Filter rows where end_date is less than or equal to today, and today is within 3 days or less from end_date
+            # rows = MyModel.objects.filter(Q(end_date__lte=today) & Q())
+
+            #  now computation for which guides and trails the tourist can review
+            possible_reviews = Hire.objects.filter(tourist=request.user.tourist.id,end_date__lte=today)
+            
+
             response = makeResponse('Successfully gotten all notification',True,data)
             return Response(response,status = status.HTTP_200_OK)
         else:
