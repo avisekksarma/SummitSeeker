@@ -293,7 +293,8 @@ class HireAcceptOrRejectView(APIView):
             if sent_status and (sent_status == 'AC' or sent_status=='RJ'):
                 hireObj.status = sent_status
                 hireObj.save()
-                res = makeResponse('Updated successfully',isSuccess=True,data=hireObj)
+                serializer = HireSerializer(hireObj)
+                res = makeResponse('Updated successfully',isSuccess=True,data=serializer.data)
                 return Response(res,status=status.HTTP_200_OK)
             else:
                 res = makeResponse('Send "AC" or "RJ" in status')
@@ -323,15 +324,25 @@ class Notification(APIView):
                 'All':others
             }
 
-            # Calculate the date 3 days from end_date
-            end_date_plus_three = date.today() + timedelta(days=3)
-
-            # Filter rows where end_date is less than or equal to today, and today is within 3 days or less from end_date
-            # rows = MyModel.objects.filter(Q(end_date__lte=today) & Q())
-
+            #  end_date <= today <= end_date + 3 days from end_date
             #  now computation for which guides and trails the tourist can review
-            possible_reviews = Hire.objects.filter(tourist=request.user.tourist.id,end_date__lte=today)
+            possible_reviews = Hire.objects.filter(tourist=request.user.tourist.id,end_date__lte=today,status='HR')
+            actual_reviews = []
+            for i in possible_reviews:
+                end_date_plus_three = i.end_date + timedelta(days=3)
+                if today <= end_date_plus_three:
+                    actual_reviews.append(i)
             
+            trails = []
+            guides = []
+            for j in actual_reviews:
+                trails.append({'id':j.trail.id,'trail_name':j.trail.name})
+                guide_user = j.guide.user
+                guide_full_name = guide_user.first_name + " "+ guide_user.last_name
+                guides.append({'id':j.guide.id,'guide_full_name':guide_full_name})
+
+            data['trails'] = trails
+            data['guides'] = guides
 
             response = makeResponse('Successfully gotten all notification',True,data)
             return Response(response,status = status.HTTP_200_OK)
@@ -354,5 +365,31 @@ class Notification(APIView):
                 'Responded':acceptedorrejected,
                 'Hired':hired
             }
+
+            # ------------------
+            #  end_date <= today <= end_date + 3 days from end_date
+            #  now computation for which tourists and trails the guide can review
+            possible_reviews = Hire.objects.filter(
+                guide=request.user.guide.id, end_date__lte=today, status='HR')
+            actual_reviews = []
+            for i in possible_reviews:
+                end_date_plus_three = i.end_date + timedelta(days=3)
+                if today <= end_date_plus_three:
+                    actual_reviews.append(i)
+
+            trails = []
+            tourists = []
+            for j in actual_reviews:
+                trails.append({'id': j.trail.id, 'trail_name': j.trail.name})
+                tourist_user = j.tourist.user
+                tourist_full_name = tourist_user.first_name + " " + tourist_user.last_name
+                tourists.append(
+                    {'id': j.tourist.id, 'tourist_full_name': tourist_full_name})
+
+            data['trails'] = trails
+            data['tourists'] = tourists
+
+            # ------------------
+
             response = makeResponse('Successfully gotten all notification',True,data)
             return Response(response,status = status.HTTP_200_OK)
