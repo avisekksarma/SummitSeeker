@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('',views.get_my_reviews,name='get-my-reviews'),
-    path('guide/<int:pk>/',views.manage_guide_review),
+    path('guide/<int:pk>/',views.manage_guide_review,name='guide-reviews'),
     # TODO: may be see below ' have i reviewed ' api design and try to improve someway.
     # Maybe check additionally if you (tourist) went to that guide in a trail i.e. booking confirmed,
     # and then reviewed or not.
