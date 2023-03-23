@@ -1,6 +1,6 @@
 from .models import Trail,Hire,GuideTrail
 from rest_framework import serializers
-from user.serializers import GuideSerializer
+from user.serializers import GuideSerializer,TouristSerializer
 from utils import log
 
 class TrailSerializer(serializers.ModelSerializer):
@@ -26,6 +26,7 @@ from datetime import datetime,timedelta
 class HireSerializer(serializers.ModelSerializer):
     guide = GuideSerializer(required=False)
     trail = TrailSerializer(required=False)
+    tourist = TouristSerializer(required=False)
     def create(self,validated_data):
         print('-----------------fdfda-------------')
         print(validated_data)

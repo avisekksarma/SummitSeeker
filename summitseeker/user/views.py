@@ -302,15 +302,19 @@ class Notification(APIView):
             all_hires = Hire.objects.filter(guide=request.user.guide.id,start_date__gte=today)
             serializer = HireSerializer(all_hires,many=True)
             requested = []
-            others = []
+            acceptedorrejected = []
+            hired= []
             for i in serializer.data:
                 if i['status'] == 'RQ':
                     requested.append(i)
+                elif i['status'] == 'AC' or i['status'] == 'RJ':
+                    acceptedorrejected.append(i)
                 else:
-                    others.append(i)
+                    hired.append(i)
             data = {
                 'Requested':requested,
-                'All':others
+                'Responded':acceptedorrejected,
+                'Hired':hired
             }
             response = makeResponse('Successfully gotten all notification',True,data)
             return Response(response,status = status.HTTP_200_OK)
