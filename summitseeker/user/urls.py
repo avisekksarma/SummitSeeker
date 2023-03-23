@@ -14,4 +14,5 @@ urlpatterns = [
     path('user/notifications/',views.Notification.as_view(),name='notification'),
     path('user/cancelrequest/<int:hire_id>',views.CancelRequest.as_view(),name='cancelrequest'),
     path('response/<int:hire_id>/',views.HireAcceptOrRejectView.as_view(),name='hire-response-by-guide'),
+    path('hire/<int:hire_id>/',views.HireTheGuide.as_view(),name='final-hire-by-tourist'),
 ]
