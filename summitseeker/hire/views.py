@@ -13,6 +13,10 @@ from django.db.models import Avg
 from datetime import datetime,timedelta,date
 from utils import log
 
+
+
+
+
 class TrailListView(APIView):
     # permission_classes = [AllowAny]
     def get(self,request):

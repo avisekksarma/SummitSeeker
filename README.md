@@ -110,7 +110,12 @@ availability = [ boolean (true/false) ] [ default = true ]
 
 Accepts GET request only
 
-/api/user/profile
+- /api/user/profile [ Accepts GET ]
+> Gets detail of the user himself/herself
+
+- /api/user/<int:user_id> [ Accepts GET ]
+> Gets detail of requested user, if the user and requested user are say tourist and guide and  tourist has hired the guide then only email,contact shown
+
 
 
 

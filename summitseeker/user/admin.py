@@ -4,7 +4,7 @@ from .models import User,Language,Tourist,Guide
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('email','userType','nationality','gender')
+    list_display = ('id','email','userType','nationality','gender')
 
 
 admin.site.register(User,UserAdmin)

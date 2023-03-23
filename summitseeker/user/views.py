@@ -15,6 +15,8 @@ from hire.serializers import GuideTrailSerializer,HireSerializer
 from hire.models import Trail,Hire
 from django_countries import countries
 from datetime import date
+import copy
+
 
 
 
@@ -113,8 +115,9 @@ class UserRegister(APIView):
                      # trek routes 
                     for i in trek_routes:
                         # i = { id: 1, money_rate: 2550 }
-                        trail = Trail.objects.get(pk=i.get('id'))
-                        if trail is None:
+                        try:
+                            trail = Trail.objects.get(pk=i.get('id'))
+                        except Trail.DoesNotExist:
                             continue
                         data = {
                             'trail':i.get('id'),
@@ -188,16 +191,40 @@ class UserLogin(APIView):
         
 class UserDetail(APIView):
     permission_classes = [IsAuthenticated]
-    def get_obj_by_pk(self,pk):
-        try:
-            return User.objects.get(pk=pk)
-        except User.DoesNotExist:
             
-            raise 
-    def get(self,request,pk):
-        user = self.get_obj_by_pk(pk)
+    def get(self,request,user_id):
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            res = makeResponse('No user of that id exists')
+            return Response(res, status=status.HTTP_404_NOT_FOUND)
         serializer = UserSerializer(user)
-        return Response(serializer.data)
+        copy_dict = copy.deepcopy(serializer.data)
+        email= copy_dict['email']
+        contactNum = copy_dict['contactNum']
+        del copy_dict['email']
+        del copy_dict['contactNum']
+        today = date.today()
+        if request.user.userType == 'TR' and user.userType == 'GD':
+            all_hires = Hire.objects.filter(tourist=request.user.tourist.id,guide=user.guide.id,start_date__gte=today)
+            hire_serializer = HireSerializer(all_hires,many=True)
+            for i in hire_serializer.data:
+                log(i,delim='*&')
+                if i['status']=='HR':
+                    copy_dict['email'] = email
+                    copy_dict['contactNum'] = contactNum
+                    break
+        elif request.user.userType == 'GD' and user.userType == 'TR':
+            all_hires = Hire.objects.filter(
+                tourist=user.tourist.id, guide=request.user.guide.id, start_date__gte=today)
+            hire_serializer = HireSerializer(all_hires, many=True)
+            for i in hire_serializer.data:
+                if i['status'] == 'HR':
+                    copy_dict['email'] = email
+                    copy_dict['contactNum'] = contactNum
+                    break
+        res = makeResponse('Gotten user detail',True,data=copy_dict)
+        return Response(res,status=status.HTTP_200_OK)
 
 class Profile(APIView):
     permission_classes = [IsAuthenticated]
