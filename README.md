@@ -172,6 +172,11 @@ In request.body:
     status = 'AC' or 'RJ' [ for accept / reject a request of tourist]
 ```
 
+##### Final Hire done by tourist:
+- /api/hire/<int:hire_id>/' [ Accepts GET only ]
+
+
+
 ##### Cancel request by tourist:
 
 - /api/user/cancelrequest/<int:hire_id> [ Accepts GET only ]

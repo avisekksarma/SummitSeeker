@@ -305,7 +305,7 @@ class HireAcceptOrRejectView(APIView):
 
 class HireTheGuide(APIView):
     permission_classes = [IsAuthenticated, IsTourist]
-    def post(self, request,hire_id):
+    def get(self, request,hire_id):
         try:
             hireObj = Hire.objects.get(pk=hire_id)
             hireObj.status = 'HR'
