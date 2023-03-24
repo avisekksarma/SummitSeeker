@@ -6,7 +6,7 @@ from utils import log
 class TrailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trail
-        fields = ['id','name','image','mapImage','days']
+        fields = ['id','name','image','mapImage','days','description']
 
 class GuideTrailSerializer(serializers.ModelSerializer):
     guide = GuideSerializer(required=False)
