@@ -12,6 +12,7 @@ class Trail(models.Model):
     image = models.ImageField(upload_to='trailphotos/',max_length=200,null=True,blank=True)
     reviews = models.ManyToManyField('user.User',through='reviews.TrailReviews')
     days = models.IntegerField()
+    description = models.TextField(default='')
     # difficulty = models.CharField(choices=difficulty_choices)
     # Following will be gotten from aggregate funcs. on another table.
     # average_days = models.IntegerField()
