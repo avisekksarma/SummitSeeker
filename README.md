@@ -191,9 +191,13 @@ In request.body:
 ```
 
 ##### Final Hire done by tourist:
-- /api/hire/<int:hire_id>/' [ Accepts GET only ]
+- /api/hire/' [ Accepts POST only ]
 
-
+```
+{
+    "hire_id":15
+}
+```
 
 ##### Cancel request by tourist:
 

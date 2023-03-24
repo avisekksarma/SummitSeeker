@@ -45,7 +45,7 @@ class TrailReviewsSerializer(serializers.ModelSerializer):
             'user': {'required': False},
             'comment': {'required': True},
             'rating': {'required': True},
-            'difficulty':{'required':True}
+            'difficulty':{'required':False}
         }
 
     def validate_rating(self, value):
