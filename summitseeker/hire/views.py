@@ -12,7 +12,7 @@ from .models import GuideTrail,Trail,Hire
 from django.db.models import Avg
 from datetime import datetime,timedelta,date
 from utils import log
-
+from django.db.models import Count
 
 
 
@@ -22,7 +22,26 @@ class TrailListView(APIView):
     def get(self,request):
         trails = Trail.objects.all()
         serializer = TrailSerializer(trails,many=True)
-        response = makeResponse('Successfully gotten all the trails data',True,serializer.data)
+        # Trending trails finding
+       
+        list_of_trending_trails = Hire.objects.values('trail').annotate(hire_instances=Count('trail')).order_by('-hire_instances')
+        trending_trails = []
+        for i in list_of_trending_trails:
+            trailObj = Trail.objects.get(pk=i['trail'])
+            trending_trails.append(TrailSerializer(trailObj).data)
+        
+        # if len(trending_trails)
+        # Finished finding trending trails
+
+        #  Now finding recommended trails
+
+        #  finding recommended trails finished
+        data = {
+            'All_Trails':serializer.data,
+            'Trending_Trails':trending_trails,
+            'Recommended_Trails':recommended_trails
+        }
+        response = makeResponse('Successfully gotten all the trails data',True,data=data)
         return Response(response,status = status.HTTP_200_OK)
     
 class TrailDetailView(APIView):

@@ -303,6 +303,27 @@ class HireAcceptOrRejectView(APIView):
             res = makeResponse('Hire object of that id does not exist')
             return Response(res,status=status.HTTP_400_BAD_REQUEST)
 
+class HireTheGuide(APIView):
+    permission_classes = [IsAuthenticated, IsTourist]
+    def post(self, request):
+        try:
+            hire_id = request.data.get('hire_id')
+            if hire_id:
+                hireObj = Hire.objects.get(pk=hire_id)
+                hireObj.status = 'HR'
+                hireObj.save()
+                serializer = HireSerializer(hireObj)
+                res = makeResponse('Guide Hired Successfully',isSuccess=True,data=serializer.data)
+                return Response(res,status=status.HTTP_200_OK)
+            else:
+                res = makeResponse('Hire id not provided in body')
+                return Response(res, status=status.HTTP_400_BAD_REQUEST)
+        except Hire.DoesNotExist:
+            res = makeResponse('Hire object of that id does not exist')
+            return Response(res,status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 class Notification(APIView):
     # sends all inquired and accepted guides for that user

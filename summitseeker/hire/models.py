@@ -57,4 +57,4 @@ class Hire(models.Model):
     money_rate = models.FloatField()
 
     def __str__(self):
-        return f'{self.tourist.user.email} is hiring {self.guide.user.email} on {self.trail.name} in status = {self.status}'
+        return f'{self.tourist.user.email} is hiring {self.guide.user.email} on {self.trail.name} in status = {self.status} ( id = {self.id} )'

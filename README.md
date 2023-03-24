@@ -141,10 +141,28 @@ Accepts GET request only
 > Gets all the reviews of user himself/herself [ valid for both guide and tourist ]
 - /api/reviews/trail/<int:trail_id> [ Accepts GET , POST ]
 > Gets all reviews in a trail, also make a review in that trail
+
+For post:
+```
+{
+    "comment":"ABC is the trail i would love to go in my whole lifetime",
+    "rating":5, [ range of 0-5 ]
+    "difficulty":8 [ range of 0-10 ]
+}
+```
+
+
 - /api/reviews/guide/<int:guide_id> [ Accepts GET , POST ]
 > Gets all reviews of a guide and also make a review on a guide only by those tourists who have once gone with the guide
-- /api/reviews/guide/<int:guide_id>/review/check [ Accepts GET ]
-> Checks if the tourist has ever reviewed that specific guide or not
+
+For post:
+```
+{
+    "comment":"Chris really knows this trail well",
+    "rating":5
+}
+```
+
 
 ##### Hiring guide:
 
@@ -170,6 +188,15 @@ In request.body:
 
 ```
     status = 'AC' or 'RJ' [ for accept / reject a request of tourist]
+```
+
+##### Final Hire done by tourist:
+- /api/hire/' [ Accepts POST only ]
+
+```
+{
+    "hire_id":15
+}
 ```
 
 ##### Cancel request by tourist:

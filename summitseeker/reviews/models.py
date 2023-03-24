@@ -7,13 +7,13 @@ class TouristReviews(models.Model):
     comment = models.TextField()
     rating = models.FloatField()
 
-    class Meta:
-        constraints =[
-            models.UniqueConstraint(fields=['guide', 'tourist'], name='unique_guide_tourist'),
-        ]
-        indexes = [
-            models.Index(fields=['guide', 'tourist']),
-        ]
+    # class Meta:
+    #     constraints =[
+    #         models.UniqueConstraint(fields=['guide', 'tourist'], name='unique_guide_tourist'),
+    #     ]
+    #     indexes = [
+    #         models.Index(fields=['guide', 'tourist']),
+    #     ]
 
     def __str__(self):
         return f'{self.guide.user.email} reviewed {self.tourist.user.email}'
@@ -26,31 +26,31 @@ class GuideReviews(models.Model):
     comment = models.TextField()
     rating = models.FloatField()
 
-    class Meta:
-        constraints =[
-            models.UniqueConstraint(fields=['tourist','guide'], name='unique_field_guide_tourist'),
-        ]
-        indexes = [
-            models.Index(fields=['tourist','guide']),
-        ]
+    # class Meta:
+    #     constraints =[
+    #         models.UniqueConstraint(fields=['tourist','guide'], name='unique_field_guide_tourist'),
+    #     ]
+    #     indexes = [
+    #         models.Index(fields=['tourist','guide']),
+    #     ]
     def __str__(self):
-        return f'{self.tourist.user.email} reviewed {self.guide.user.email}'
+        return f'({self.id}) {self.tourist.user.email} reviewed {self.guide.user.email}'
     
 class TrailReviews(models.Model):
     trail = models.ForeignKey('hire.Trail', on_delete=models.CASCADE)
     user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     comment = models.TextField()
     rating = models.FloatField()
-    difficulty = models.IntegerField()
+    difficulty = models.IntegerField(default=7)
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['trail', 'user'], name='unique_field_trail_user'),
-        ]
-        indexes = [
-            models.Index(fields=['trail', 'user']),
-        ]
+    # class Meta:
+    #     # constraints = [
+    #     #     models.UniqueConstraint(
+    #     #         fields=['trail', 'user'], name='unique_field_trail_user'),
+    #     # ]
+    #     indexes = [
+    #         models.Index(fields=['trail', 'user']),
+    #     ]
 
     def __str__(self):
         return f'{self.trail.name} reviewed by {self.user.email}'
