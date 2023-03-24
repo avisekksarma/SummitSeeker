@@ -30,16 +30,17 @@ class TrailListView(APIView):
             trailObj = Trail.objects.get(pk=i['trail'])
             trending_trails.append(TrailSerializer(trailObj).data)
         
-        # if len(trending_trails)
+        if len(trending_trails) < 2:
+            trending_trails = serializer.data
         # Finished finding trending trails
 
         #  Now finding recommended trails
-
+# TODO: I was here
         #  finding recommended trails finished
         data = {
             'All_Trails':serializer.data,
             'Trending_Trails':trending_trails,
-            'Recommended_Trails':recommended_trails
+            # 'Recommended_Trails':recommended_trails
         }
         response = makeResponse('Successfully gotten all the trails data',True,data=data)
         return Response(response,status = status.HTTP_200_OK)
